@@ -1,4 +1,5 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -41,8 +42,6 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-const { EmbedBuilder } = require('discord.js');
-
 client.on('messageDelete', async (message) => {
   console.log('[DEBUG] Suppression détectée');
 
@@ -52,15 +51,14 @@ client.on('messageDelete', async (message) => {
   if (!logChannel) return;
 
   const embed = new EmbedBuilder()
-    .setColor(0xff0000) // rouge
-    .setAuthor({ 
-      name: `${message.author.tag}`, 
-      iconURL: message.author.displayAvatarURL() 
+    .setColor(0xff0000)
+    .setAuthor({
+      name: `${message.author.tag}`,
+      iconURL: message.author.displayAvatarURL()
     })
     .setDescription(`**Deleted message** in ${message.channel}:\n${message.content || "*[No text]*"}`)
     .setTimestamp();
 
-  // Si des fichiers sont supprimés (image, gif, vidéo, etc.)
   if (message.attachments.size > 0) {
     const files = message.attachments.map(att => att.url).join('\n');
     embed.addFields({ name: 'Attachment(s)', value: files });
@@ -74,4 +72,3 @@ client.once('ready', () => {
 });
 
 client.login(TOKEN);
-
