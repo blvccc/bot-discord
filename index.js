@@ -41,16 +41,32 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+const { EmbedBuilder } = require('discord.js');
+
 client.on('messageDelete', async (message) => {
   console.log('[DEBUG] Suppression détectée');
+
   if (!message.guild || message.author?.bot) return;
 
   const logChannel = message.guild.channels.cache.find(c => c.name === 'logs-suppression');
   if (!logChannel) return;
 
-  const contenu = message.content || '[Message vide ou fichier supprimé]';
-  logChannel.send(`**Message supprimé** de ${message.author.tag} dans ${message.channel} :
-\`${contenu}\``);
+  const embed = new EmbedBuilder()
+    .setColor(0xff0000) // rouge
+    .setAuthor({ 
+      name: `${message.author.tag}`, 
+      iconURL: message.author.displayAvatarURL() 
+    })
+    .setDescription(`**Deleted message** in ${message.channel}:\n${message.content || "*[No text]*"}`)
+    .setTimestamp();
+
+  // Si des fichiers sont supprimés (image, gif, vidéo, etc.)
+  if (message.attachments.size > 0) {
+    const files = message.attachments.map(att => att.url).join('\n');
+    embed.addFields({ name: 'Attachment(s)', value: files });
+  }
+
+  logChannel.send({ embeds: [embed] });
 });
 
 client.once('ready', () => {
