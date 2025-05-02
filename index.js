@@ -41,8 +41,20 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+client.on('messageDelete', async (message) => {
+  if (!message.guild || message.author?.bot) return;
+
+  const logChannel = message.guild.channels.cache.find(c => c.name === 'logs-suppression');
+  if (!logChannel) return;
+
+  const contenu = message.content || '[Message vide ou fichier supprimé]';
+  logChannel.send(`**Message supprimé** de ${message.author.tag} dans ${message.channel} :
+\`${contenu}\``);
+});
+
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
 client.login(TOKEN);
+
