@@ -42,6 +42,7 @@ client.on('messageCreate', async (message) => {
 });
 
 client.on('messageDelete', async (message) => {
+  console.log('[DEBUG] Suppression détectée');
   if (!message.guild || message.author?.bot) return;
 
   const logChannel = message.guild.channels.cache.find(c => c.name === 'logs-suppression');
