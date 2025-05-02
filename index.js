@@ -60,8 +60,7 @@ client.on('messageDelete', async (message) => {
     .setTimestamp();
 
   if (message.attachments.size > 0) {
-    const files = message.attachments.map(att => att.url).join('\n');
-    embed.addFields({ name: 'Attachment(s)', value: files });
+    embed.setImage(message.attachments.first().url);
   }
 
   logChannel.send({ embeds: [embed] });
