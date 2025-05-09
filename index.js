@@ -11,7 +11,7 @@ const client = new Client({
 
 const TOKEN = process.env.TOKEN;
 const TIMEOUT_MS = 60000; // 1 minute
-const SPAM_LIMIT = 5;
+const SPAM_LIMIT = 3;
 const TIME_WINDOW = 5000;
 
 const userMessages = new Map();
