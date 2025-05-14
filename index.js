@@ -19,6 +19,18 @@ const userMessages = new Map();
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
+  // suppression des messages contenant "darby"
+  if (message.content.toLowerCase().includes('darby')) {
+    try {
+      await message.delete();
+      console.log(`Message supprimé : "${message.content}"`);
+      return; // empêche d'exécuter l'anti-spam si "darby" est détecté
+    } catch (err) {
+      console.error('Erreur suppression :', err);
+    }
+  }
+
+  // anti-spam
   const userId = message.author.id;
   const now = Date.now();
 
