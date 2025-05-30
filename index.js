@@ -19,18 +19,18 @@ const userMessages = new Map();
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
-  // suppression des messages contenant "darby"
+  // Delete messages containing "darby"
   if (message.content.toLowerCase().includes('darby')) {
     try {
       await message.delete();
-      console.log(`Message supprimé : "${message.content}"`);
-      return; // empêche d'exécuter l'anti-spam si "darby" est détecté
+      console.log(`Deleted message: "${message.content}"`);
+      return; // Skip spam check if "darby" is detected
     } catch (err) {
-      console.error('Erreur suppression :', err);
+      console.error('Delete error:', err);
     }
   }
 
-  // anti-spam
+  // Anti-spam system
   const userId = message.author.id;
   const now = Date.now();
 
@@ -49,13 +49,13 @@ client.on('messageCreate', async (message) => {
       await message.member.timeout(TIMEOUT_MS, 'Spam detected');
       await message.channel.send(`${message.author} has been timed out for spam.`);
     } catch (err) {
-      console.log('Error:', err);
+      console.log('Timeout error:', err);
     }
   }
 });
 
 client.on('messageDelete', async (message) => {
-  console.log('[DEBUG] Suppression détectée');
+  console.log('[DEBUG] Message deletion detected');
 
   if (!message.guild || message.author?.bot) return;
 
@@ -81,5 +81,26 @@ client.on('messageDelete', async (message) => {
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
+
+
+// 🔻 Add this block to make the bot leave a specific server 🔻
+client.once('ready', async () => {
+  const SERVER_ID = '1335803225789566998'; // Your actual server ID
+
+  const guild = client.guilds.cache.get(SERVER_ID);
+  if (!guild) {
+    console.log(`Bot is not in the server with ID: ${SERVER_ID}`);
+    return;
+  }
+
+  try {
+    await guild.leave();
+    console.log(`Bot has left the server: ${guild.name}`);
+  } catch (error) {
+    console.error('Error leaving the server:', error);
+  }
+});
+// 🔺 End of leave-server logic 🔺
+
 
 client.login(TOKEN);
