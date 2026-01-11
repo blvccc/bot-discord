@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 
+// Crée le client Discord
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -9,34 +10,21 @@ const client = new Client({
   ]
 });
 
-const TOKEN = process.env.TOKEN;
+const TOKEN = process.env.TOKEN; // Token sécurisé via Replit Secrets
 const TIMEOUT_MS = 60000; // 1 minute
 const SPAM_LIMIT = 3;
 const TIME_WINDOW = 5000;
 
 const userMessages = new Map();
 
+// Anti-spam
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
-  // Delete messages containing "darby"
-  if (message.content.toLowerCase().includes('darby')) {
-    try {
-      await message.delete();
-      console.log(`Deleted message: "${message.content}"`);
-      return; // Skip spam check if "darby" is detected
-    } catch (err) {
-      console.error('Delete error:', err);
-    }
-  }
-
-  // Anti-spam system
   const userId = message.author.id;
   const now = Date.now();
 
-  if (!userMessages.has(userId)) {
-    userMessages.set(userId, []);
-  }
+  if (!userMessages.has(userId)) userMessages.set(userId, []);
 
   const history = userMessages.get(userId).filter(m => now - m.timestamp < TIME_WINDOW);
   history.push({ content: message.content, timestamp: now });
@@ -54,9 +42,8 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+// Logs des messages supprimés
 client.on('messageDelete', async (message) => {
-  console.log('[DEBUG] Message deletion detected');
-
   if (!message.guild || message.author?.bot) return;
 
   const logChannel = message.guild.channels.cache.find(c => c.name === 'logs-suppression');
@@ -78,29 +65,10 @@ client.on('messageDelete', async (message) => {
   logChannel.send({ embeds: [embed] });
 });
 
+// Quand le bot est prêt
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
-
-// 🔻 Add this block to make the bot leave a specific server 🔻
-client.once('ready', async () => {
-  const SERVER_ID = '1335803225789566998'; // Your actual server ID
-
-  const guild = client.guilds.cache.get(SERVER_ID);
-  if (!guild) {
-    console.log(`Bot is not in the server with ID: ${SERVER_ID}`);
-    return;
-  }
-
-  try {
-    await guild.leave();
-    console.log(`Bot has left the server: ${guild.name}`);
-  } catch (error) {
-    console.error('Error leaving the server:', error);
-  }
-});
-// 🔺 End of leave-server logic 🔺
-
-
+// Connexion du bot
 client.login(TOKEN);
